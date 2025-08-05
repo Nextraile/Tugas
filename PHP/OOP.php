@@ -1,6 +1,6 @@
 <?php
 class Sigma {
-    public  $skibidi,
+    private $skibidi,
             $sigma,
             $latina,
             $batak,
@@ -33,8 +33,21 @@ class Sigma {
 
         return $str;
     }
+
+    public function setSuku($suku){
+        if ($suku == "batak"){
+            $this->batak = true;
+        } elseif ($suku == "medan") {
+            $this->medan = true;
+        } elseif ($suku == "pace"){
+            $this->pace = true;
+        } elseif ($suku == "jawa"){
+            $this->jawa = true;
+        }
+    }
 }
 
-$Mugiyono = new Sigma(true, false, false, true, false, true, true);
+$Mugiyono = new Sigma(false, false, false, false, false, false, false);
+$Mugiyono->setSuku("batak");
 $gyat = $Mugiyono->muscleMemory();
 echo $gyat;
