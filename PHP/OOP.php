@@ -1,131 +1,339 @@
 <?php
-class Bankdik {
-    //property
+class bankDik
+{
+    // property
     private $nama = "",
             $saldo = 0,
             $statusAkun = "Reguler";
 
-    //constructor buat nginput value property tiap objek
-    public function __construct($nama, $saldo, $status){
+    // constructor buat nginput value property tiap objek
+    public function __construct($nama, $saldo, $status)
+    {
         $this->nama = $nama;
         $this->saldo = $saldo;
         $this->statusAkun = $status;
     }
 
-    //setter methods
-    protected function setNama($nama){
+    // setter methods
+    protected function setNama($nama)
+    {
         $this->nama = $nama;
     }
-    protected function setSaldo($saldo){
+
+    protected function setSaldo($saldo)
+    {
         $this->saldo = $saldo;
     }
-    protected function setStatusAkun($status){
+
+    protected function setStatusAkun($status)
+    {
         $this->statusAkun = $status;
     }
 
-    //getter methods
-    public function getNama(){
+    // getter methods
+    public function getNama()
+    {
         return $this->nama;
     }
-    public function getSaldo(){
+
+    public function getSaldo()
+    {
         return $this->saldo;
     }
-    public function getStatusAkun(){
+
+    public function getStatusAkun()
+    {
         return $this->statusAkun;
     }
 
-    //transaksi methods
-    protected function tambahSaldo($nominal){
-        $str = $this->saldo += $nominal;
-        return $str;
+    // method buat menampilkan informasi akun
+    public function getInfoAkun()
+    {
+        $nama = $this->getNama();
+        $saldo = $this->getSaldo();
+        $status = $this->getStatusAkun();
+
+        return  "Akun " . $status . ": " . $nama . "\n" .
+                "Saldo: Rp " . number_format($saldo);
     }
 
-    protected function kurangiSaldo($nominal){
-        $str = $this->saldo -= $nominal;
-        return $str;
+    // operator saldo methods
+    protected function tambahSaldo($nominal)
+    {
+        $saldo = $this->getSaldo();
+        $str = $saldo += $nominal;
+        $this->setSaldo($str);
     }
 
-    // methods
-    public function deposit($nominal){
-        $minimalDeposit = number_format(50000);
-        $saldo = $this->saldo;
+    protected function kurangiSaldo($nominal)
+    {
+        $saldo = $this->getSaldo();
+        $str = $saldo -= $nominal;
+        $this->setSaldo($str);
+    }
 
-        if ($nominal <= $minimalDeposit) {
-            $str =  "Transaksi gagal!\n".
-                    "Nominal minimal deposit adalah Rp number_format($minimalDeposit)";
-        } else {
-            $saldoSekarang = Bankdik::tambahSaldo($nominal);
-            $str =  "Transaksi berhasil!\n".
-                    "Nominal sebesar Rp number_format($nominal) berhasil ditambahkan ke dalam saldo\n".
-                    "Total saldo saat ini: Rp number_format($saldoSekarang)";
+    // deposit method
+    public function deposit($nominal)
+    {
+        $minimalDeposit = 50000;
+        $saldo = $this->getSaldo();
+
+        if ($nominal <= $minimalDeposit)
+        {
+            return  "Transaksi gagal!\n".
+                    "Nominal minimal deposit adalah Rp " . number_format($minimalDeposit);
         }
-
-        return $str;
+        else
+        {
+            $saldoSekarang = $this->tambahSaldo($nominal);
+            return  "Transaksi berhasil!\n".
+                    "Nominal sebesar Rp " . number_format($nominal) . " berhasil ditambahkan ke dalam saldo\n".
+                    "Total saldo saat ini: Rp " . number_format($saldoSekarang);
+        }
     }
 
-    //tarik methods
-    public function withdraw($nominal){
+    // withdraw methods
+    public function withdraw($nominal)
+    {
         $minimalTarik = 50000;
         $maksimalTarik = 2000000;
-        $saldo = $this->saldo;
+        $saldo = $this->getSaldo();
 
         if ($nominal <= $minimalTarik)
         {
-            $str =  "Penarikan gagal!\n".
-                    "Nominal minimal penarikan adalah Rp number_$minimalTarik";
+            return  false &&
+                    "Penarikan gagal!\n".
+                    "Nominal minimal penarikan adalah Rp " . number_format($minimalTarik);
         }
         else if ($nominal > $maksimalTarik)
         {
-            $str =  "Penarikan gagal!\n".
-                    "Nominal maksimal penarikan adalah Rp $maksimalTarik";
+            return  false &&
+                    "Penarikan gagal!\n".
+                    "Nominal maksimal penarikan adalah Rp " . number_format($maksimalTarik);
         }
         else if ($nominal > $saldo)
         {
-            $str = "Penarikan gagal!\n".
+            return  false &&
+                    "Penarikan gagal!\n".
                     "Saldo tidak mencukupi";
         }
         else
         {
-            $saldo = Bankdik::kurangiSaldo($nominal);
-            $str =  "Penarikan berhasil!\n".
-                    "Saldo ditarik: Rp $nominal\n".
-                    "Total saldo saat ini: Rp $saldo";
+            $saldo = $this->kurangiSaldo($nominal);
+            return  true &&
+                    "Penarikan berhasil!\n".
+                    "Saldo ditarik: Rp " . number_format($nominal) . "\n".
+                    "Total saldo saat ini: Rp " . number_format($saldo);
         }
 
-        return $str;
     }
 
-        public function transfer($subjek, $nominal){
+    // transfer methods
+    public function transfer($subjek, $nominal)
+    {
         $minimalTransfer = 50000;
-        $saldo = $this->saldo;
-        $namaSubjek = $subjek->nama;
-        $saldoSubjek = $subjek->saldo;
+        $saldo = $this->getSaldo();
+        $namaSubjek = $subjek->getNama();
+        $saldoSubjek = $subjek->getSaldo();
         $estimasiSaldo = $saldo - $nominal;
 
-        if (!$subjek instanceof Bankdik)
+        if (!$subjek instanceof bankDik)
         {
-            $str =  "Transaksi gagal!\n".
+            return  false &&
+                    "Transaksi gagal!\n".
                     "Nama akun yang dituju tidak ditemukan";
         }
         elseif ($nominal < $minimalTransfer)
         {
-            $str =  "Transaksi gagal!\n".
-                    "Nominal minimal transfer adalah $minimalTransfer";
+            return  false &&
+                    "Transaksi gagal!\n".
+                    "Nominal minimal transfer adalah Rp " . number_format($minimalTransfer);
         }
         elseif ($estimasiSaldo <= 0)
         {
-            $str =  "Transaksi gagal!\n".
+            return  false &&
+                    "Transaksi gagal!\n".
                     "Saldo tidak mencukupi";
         }
         else
         {
-            $saldo = Bankdik::kurangiSaldo($nominal);
+            $saldo = $this->kurangiSaldo($nominal);
             $saldoSubjek += $nominal;
-            $str =  "Transaksi berhasil!\n".
-                    "Nominal sejumlah Rp $nominal berhasil ditransfer ke akun $namaSubjek\n".
-                    "Saldo saat ini: Rp $saldo";
+            return  true &&
+                    "Transaksi berhasil!\n".
+                    "Nominal sejumlah Rp " . number_format($nominal) . " berhasil ditransfer ke akun $namaSubjek\n".
+                    "Saldo saat ini: Rp " . number_format($saldo);
         }
         
-        return $str;
     }
 }
+
+trait bankDik
+{
+    protected function error($str)
+    {
+        return "Transaksi gagal!\n" . $pesan;
+    }
+}
+
+// subclass akun reguler
+class akunReguler extends bankDik
+{
+    // constructor buat akun reguler
+    public function __construct($nama, $saldo)
+    {
+        // manggil constructor parent dengan parameternya ditambah status akun
+        parent::__construct($nama, $saldo, "Reguler");
+    }
+
+    public function deposit($nominal)
+    {
+        $persentase = 2;
+        $cashback = $persentase / 100 * $nominal;
+
+        // manggil method deposit parent
+        $str1 = parent::deposit($nominal);
+
+        if ($cashback)
+        {
+        $this->tambahSaldo($cashback);
+            $str2 = "Cashback sebesar Rp " . number_format($cashback) . " berhasil ditambahkan ke dalam saldo" .
+                    "\nSaldo saat ini: Rp " . number_format($this->getSaldo());
+        }
+        else
+        {
+            $str2 = "Tidak ada cashback";
+        }
+
+        return  $str = $str1 . "\n" . $str2;
+    }
+
+    public function withdraw($nominal)
+    {
+        $persentase = 2;
+        $cashback = $persentase / 100 * $nominal;
+
+        // manggil method transfer parent
+        $str1 = parent::withdraw($nominal);
+
+        if ($cashback)
+        {
+        $this->tambahSaldo($cashback);
+            $str2 = "Cashback sebesar Rp " . number_format($cashback) . " berhasil ditambahkan ke dalam saldo" .
+                    "\nSaldo saat ini: Rp " . number_format($this->getSaldo());
+        }
+        else
+        {
+            $str2 = "Tidak ada cashback";
+        }
+
+        return  $str = $str1 . "\n" . $str2;
+    }
+
+    public function transfer($subjek, $nominal)
+    {
+        $persentase = 2;
+        $cashback = $persentase / 100 * $nominal;
+
+        // manggil method transfer parent
+        $str1 = parent::transfer($subjek, $nominal);
+
+        if ($cashback)
+        {
+        $this->tambahSaldo($cashback);
+            $str2 = "Cashback sebesar Rp " . number_format($cashback) . " berhasil ditambahkan ke dalam saldo" .
+                    "\nSaldo saat ini: Rp " . number_format($this->getSaldo());
+        }
+        else
+        {
+            $str2 = "Tidak ada cashback";
+        }
+
+        return  $str = $str1 . "\n" . $str2;
+    }
+}
+
+// subclass akun prioritastemek
+class akunPrioritas extends bankDik
+{
+    // constructor buat akun prioritas
+    public function __construct($nama, $saldo)
+    {
+        // manggil constructor parent dengan parameternya ditambah status akun
+        parent::__construct($nama, $saldo, "Prioritas");
+    }
+
+    // override method deposit
+    public function deposit($nominal)
+    {
+        $persentase = 5;
+        $cashback = $persentase / 100 * $nominal;
+
+        // manggil method deposit parent
+        $str1 = parent::deposit($nominal);
+
+        if ($cashback
+            )
+        {
+        $this->tambahSaldo($cashback);
+            $str2 = "Cashback sebesar Rp " . number_format($cashback) . " berhasil ditambahkan ke dalam saldo" .
+                    "\nSaldo saat ini: Rp " . number_format($this->getSaldo());
+        }
+        else
+        {
+            $str2 = "Tidak ada cashback";
+        }
+
+        return  $str = $str1 . "\n" . $str2;
+    }
+
+    // override method withdraw
+    public function withdraw($nominal)
+    {
+        $persentase = 5;
+        $cashback = $persentase / 100 * $nominal;
+
+        // manggil method transfer parent
+        $str1 = parent::withdraw($nominal);
+
+        if ($cashback)
+        {
+        $this->tambahSaldo($cashback);
+            $str2 = "Cashback sebesar Rp " . number_format($cashback) . " berhasil ditambahkan ke dalam saldo" .
+                    "\nSaldo saat ini: Rp " . number_format($this->getSaldo());
+        }
+        else
+        {
+            $str2 = "Tidak ada cashback";
+        }
+
+        return  $str = $str1 . "\n" . $str2;
+    }
+
+    // override method transfer
+    public function transfer($subjek, $nominal)
+    {
+        $persentase = 5;
+        $cashback = $persentase / 100 * $nominal;
+
+        // manggil method transfer parent
+        $str1 = parent::transfer($subjek, $nominal);
+
+        if (!$cashback)
+        {
+            $str2 = "Tidak ada cashback";
+        }
+        else
+        {
+            $this->tambahSaldo($cashback);
+            $str2 = "Cashback sebesar Rp " . number_format($cashback) . " berhasil ditambahkan ke dalam saldo" .
+                    "\nSaldo saat ini: Rp " . number_format($this->getSaldo());
+        }
+
+        return  $str = $str1 . "\n" . $str2;
+    }
+}
+ 
+$a = new akunPrioritas("Budi", 100000);
+echo $a->getInfoAkun() . "\n";
+echo $a->deposit(10000);
