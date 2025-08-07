@@ -1,1 +1,1 @@
-<h3>Currently learning OOP in PHP</h3>
+<h1 style="text-align: center">Currently learning OOP in PHP</h1>
