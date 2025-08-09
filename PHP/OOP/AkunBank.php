@@ -1,5 +1,5 @@
 <?php
-class akunBank
+class AkunBank
 {
     // property
     private $nama = "",
@@ -129,7 +129,7 @@ class akunBank
         $saldoSubjek = $subjek->getSaldo();
         $estimasiSaldo = $saldo - $nominal;
 
-        if (!$subjek instanceof akunBank)
+        if (!$subjek instanceof AkunBank)
         {
             $error = "Transaksi gagal!\n".
                     "Nama akun yang dituju tidak ditemukan";
